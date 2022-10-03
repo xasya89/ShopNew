@@ -1,0 +1,118 @@
+﻿@using MudBlazor
+@using ShopNew.DAL
+@using ShopNew.DAL.Models
+@using Microsoft.EntityFrameworkCore
+@using ShopNew.Web.Infrastructure
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDbContextFactory<shop_newContext> _dbFactory
+@inherits LayoutComponentBase
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+<PageTitle>ShopNew.Web</PageTitle>
+
+
+<MudLayout>
+    <MudAppBar Elevation="1">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudSpacer />
+        <AuthorizeView>
+            <Authorized>
+                <span class=" text-white" style="margin-right: 15px">@shopSelected?.Name</span>
+                <MudMenu>
+                    <ActivatorContent>
+                        <span></span>
+                        <MudIcon Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit"/>
+                    </ActivatorContent>
+                    <ChildContent>
+                        @foreach(var shop in shopList){
+                            <MudMenuItem OnClick=@(()=>changeShopSelected(shop))>@shop.Name</MudMenuItem>
+                        }
+                        <MudMenuItem>&nbsp;</MudMenuItem>
+                        <MudMenuItem OnClick="LogOut">Выход</MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
+            </Authorized>
+            <NotAuthorized>
+                <a href="login" class="btn btn-sm btn-danger">Войти</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
+    <MudDrawer @bind-Open="@open" Breakpoint="@breakpoint" Elevation="1" Variant="@DrawerVariant.Responsive" PreserveOpenState="@preserveOpenState">
+        <NavMenu />
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer Class="mt-6" MaxWidth="MaxWidth.False">
+            <CascadingValue Value=@user Name="UserInfo">
+                <CascadingValue Value="shopSelected" Name="Shop">
+                    @Body
+                </CascadingValue>
+            </CascadingValue>
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+@code {
+    [Inject]
+    NavigationManager navigationManager { get; set; }
+    [Inject]
+    ISessionStorageService _store { get; set; }
+
+
+    bool open = false;
+    bool preserveOpenState = false;
+    Breakpoint breakpoint = Breakpoint.Lg;
+    shop_newContext _context;
+
+    private IEnumerable<Shop> shopList = new List<Shop>();
+    private Shop? shopSelected = null;
+
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+
+    User user;
+    protected override async Task OnInitializedAsync()
+    {
+        _context = _dbFactory.CreateDbContext();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            var claim = user.Claims.Where(c => c.Type == "UserId").FirstOrDefault();
+            if(claim!=null){
+                var shops = (await _context.Users.Include(u => u.Organization).ThenInclude(o => o.Shops)
+                .Where(u => u.Id == Convert.ToInt32(claim.Value)).Select(u => u.Organization).FirstOrDefaultAsync())?.Shops;
+                shopList = shops;
+                shopSelected = shops?.FirstOrDefault();
+            }
+        }
+    }
+
+    protected async Task LogOut(){
+        await _store.RemoveAsync("token");
+        navigationManager.NavigateTo("/login",true);
+    }
+
+    private void changeShopSelected(Shop shop) => shopSelected = shop;
+}
+<!--
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <div class="top-row px-4">
+            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        </div>
+
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+-->

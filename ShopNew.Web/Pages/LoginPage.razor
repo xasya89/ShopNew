@@ -1,0 +1,15 @@
+﻿@page "/login"
+@inherits ShopNew.Web.ViewModels.LoginViewModel
+
+<EditForm EditContext=loginEditContext OnSubmit=Login>
+    <DataAnnotationsValidator />
+    <MudCard>
+        <MudCardContent>
+
+            <MudTextField @bind-Value=@loginModel.Login For=@(()=>loginModel.Login) T=string Label="пользователь" Required=true />
+            <MudTextField @bind-Value=@loginModel.Password For=@(()=>loginModel.Password) T=string InputType="InputType.Password" Label="Пароль" Required=true Class="mb-2" />
+
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Войти</MudButton>
+        </MudCardContent>
+    </MudCard>
+</EditForm>

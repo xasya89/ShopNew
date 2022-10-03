@@ -1,0 +1,76 @@
+﻿@page "/goodedit/{id:int?}"
+@inherits ShopNew.Web.ViewModels.Goods.OrderEditViewModel
+
+
+<EditForm Model="good" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudGrid>
+        <MudItem xs="12" sm="7">
+            <MudCard>
+                <MudCardContent>
+                    <MudTextField Label="Наименование" 
+                                  @bind-Value="good.Name" For="@(() => good.Name)" />
+                    <MudSelect Label="Группа" T="int" @bind-Value="good.GoodGroupId" For="@(()=>good.GoodGroupId)" Variant="Variant.Text">
+                        @foreach(var group in groups){
+                            <MudSelectItem T="int" Value="group.Id">@group.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudSelect Label="Постащик" T="int?" @bind-Value="good.SupplierId" For="@(()=>good.SupplierId)">
+                        <MudSelectItem T="int?" Value="null"></MudSelectItem>
+                        @foreach(var supplier in suppliers){
+                            <MudSelectItem T="int" Value="supplier.Id">@supplier.OrgName</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudTextField Label="Артикул"
+                                  @bind-Value="good.Article" For="@(() => good.Article)" />
+                    <MudSelect T="Unit" @bind-Value="good.Unit" For="@(()=>good.Unit)" Label="Ед измерения" Variant="Variant.Text">
+                        @foreach (var unit in EnumExtension.ToDictionary<Unit>())
+                        {
+                            <MudSelectItem T="Unit" Value="unit.Key">@unit.Value</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <MudTextField Label="Цена" T="decimal" @bind-Value="good.Price" For="@(()=>good.Price)" />
+                    <MudCheckBox Label="Удален" @bind-Checked="good.IsDeleted" For="@(()=>good.IsDeleted)" />
+                    <hr class="hr"/>
+                    <MudList Clickable="false" Dense="true" DisableGutters="false">
+                        @if(good.BarCodes!=null)
+                            @foreach(var barcode in good.BarCodes){
+                                <MudListItem OnClick=@(()=>DeleteBarCode(barcode)) Text=@barcode.Code Icon="@Icons.Filled.RestoreFromTrash" IconColor="Color.Error" />
+                            }
+                    </MudList>
+                    <div class="d-flex ">
+                        <div class="d-flex">
+                            <MudTextField Placeholder="Штрих код" T="string" @bind-Value="newBarCodeStr" For="@(()=>newBarCodeStr)"/>
+                        </div>
+                        <div class="d-flex">
+                            <MudButton OnClick="AddBarCode">добавить</MudButton>
+                        </div>
+                    </div>
+                </MudCardContent>
+                <MudCardActions>
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Сохрнаить</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudItem>
+        <MudItem xs="12" sm="5">
+            <MudPaper Class="pa-4 mud-height-full">
+                <MudText Typo="Typo.subtitle2">Validation Summary</MudText>
+                @if (success)
+                {
+                    <MudText Color="Color.Success">Success</MudText>
+                }
+                else
+                {
+                    <MudText Color="@Color.Error">
+                        <ValidationSummary />
+                    </MudText>
+                }
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.body2" Align="Align.Center">
+                Fill out the form correctly to see the success message.
+            </MudText>
+        </MudItem>
+    </MudGrid>
+</EditForm>
