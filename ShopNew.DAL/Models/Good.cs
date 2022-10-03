@@ -22,7 +22,7 @@ namespace ShopNew.DAL.Models
     public class Good
     {
         public int Id { get; set; }
-        public Guid Uuid { get; set; } = new();
+        public Guid Uuid { get; set; } = Guid.NewGuid();
         [Range(1,int.MaxValue, ErrorMessage = "Не выбрана группа")]
         public int GoodGroupId { get; set; }
         public GoodGroup GoodGroup { get; set; }

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace ShopNew.Web.ViewModels.Goods
 {
-    public class OrderEditViewModel:OwningComponentBase, IDisposable
+    public class GoodEditViewModel:OwningComponentBase, IDisposable
     {
         [CascadingParameter(Name = "Shop")]
         private Shop shop { get; set; }
@@ -46,6 +46,12 @@ namespace ShopNew.Web.ViewModels.Goods
         {
             success = true;
             StateHasChanged();
+            if (good.Id == 0)
+            {
+                _context.Goods.Add(good);
+                //TODO: Добавить возможность указания начальных остатков
+            }
+            _context.SaveChanges();
         }
 
 
