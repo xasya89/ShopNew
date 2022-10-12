@@ -30,7 +30,7 @@ namespace ShopNew.Web.ViewModels.Goods
         {
             editContext = new EditContext(good);
             _context=_dbFactory.CreateDbContext();
-            good = await _context.Goods.Where(g => g.Id == id).FirstOrDefaultAsync();
+            good = await _context.Goods.Include(g=>g.BarCodes).Where(g => g.Id == id).FirstOrDefaultAsync();
             if (good == null)
                 good = new();
             if (shop != null)
@@ -52,10 +52,14 @@ namespace ShopNew.Web.ViewModels.Goods
                 //TODO: Добавить возможность указания начальных остатков
             }
             _context.SaveChanges();
+            _navigation.NavigateTo("/goods");
         }
 
 
-        public void AddBarCode() => good.BarCodes.Add(new BarCode { Good= good, Code=newBarCodeStr});
+        public void AddBarCode()
+        {
+            if (newBarCodeStr != "") good.BarCodes.Add(new BarCode { Good = good, Code = newBarCodeStr });
+        }
         public void DeleteBarCode(BarCode barcode) => good.BarCodes.Remove(barcode);
 
         public void Dispose() => _context.Dispose();

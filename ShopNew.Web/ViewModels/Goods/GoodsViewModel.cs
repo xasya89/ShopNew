@@ -33,6 +33,8 @@ namespace ShopNew.Web.ViewModels.Goods
             _context = _dbFactory.CreateDbContext();
             await SelectedGroups();
             isInitialized = true;
+            if(goodTableState!=null)
+                ServerReload(goodTableState);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -50,8 +52,10 @@ namespace ShopNew.Web.ViewModels.Goods
             }
         }
 
+        TableState goodTableState = null;
         public async Task<TableData<Good>> ServerReload(TableState state)
         {
+            goodTableState = state;
             if (!isInitialized)
                 return new TableData<Good>() { TotalItems = 0, Items = new List<Good>() };
             var goods = new List<Good>();
@@ -122,6 +126,8 @@ namespace ShopNew.Web.ViewModels.Goods
         }
 
         public void AddGood() => navigation.NavigateTo("/goodedit");
+        public void EditGood(Good good) => navigation.NavigateTo("/goodedit/" + good.Id);
+        public void AddGroup() => navigation.NavigateTo("/goodgroup");
 
         public void Dispose() => _context.Dispose();
     }

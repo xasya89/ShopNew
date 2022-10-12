@@ -3,13 +3,15 @@
 
 <h3>Список товаров в <span>@shop?.Name</span></h3>
 
-<MudButton Color="Color.Success" OnClick="AddGood">Добавить</MudButton>
+<MudButton Color="Color.Success" OnClick="AddGood">Товар</MudButton>
+<MudButton Color="Color.Success" OnClick="AddGroup">Группу</MudButton>
+<MudButton Color="Color.Success" OnClick="AddGood">Ценники</MudButton>
 
 <div class="table-responsive">
     <MudTable ServerData="@(new Func<TableState, Task<TableData<Good>>>(ServerReload))"
               Dense="true" Hover="true" @ref="table">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Periodic Elements</MudText>
+            <!--<MudText Typo="Typo.h6">Periodic Elements</MudText>-->
             <MudSpacer />
             <MudSelect T="GoodGroup" Value="selectedGoodGroup" Variant="Variant.Text">
                 <MudSelectItem T="GoodGroup" Value="null"></MudSelectItem>
@@ -22,6 +24,7 @@
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
         </ToolBarContent>
         <HeaderContent>
+            <MudTh></MudTh>
             <MudTh><MudTableSortLabel SortLabel="nr_field" T="Good">Группа</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="sign_field" T="Good">Товар</MudTableSortLabel></MudTh>
             <MudTh><MudTableSortLabel SortLabel="name_field" T="Good">Ед</MudTableSortLabel></MudTh>
@@ -29,11 +32,14 @@
             <MudTh><MudTableSortLabel SortLabel="mass_field" T="Good">Кол-во</MudTableSortLabel></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="Nr">@context.GoodGroup?.Name</MudTd>
-            <MudTd DataLabel="Sign">@context.Name</MudTd>
-            <MudTd DataLabel="Name">@context.Unit</MudTd>
-            <MudTd DataLabel="Position">@context.Price</MudTd>
-            <MudTd DataLabel="Molar mass">0</MudTd>
+            <MudTd>
+                <MudIconButton Icon="@Icons.Filled.EditNote" Color="Color.Success" OnClick="@(()=>EditGood(context))"/>
+            </MudTd>
+            <MudTd DataLabel="Группа">@context.GoodGroup?.Name</MudTd>
+            <MudTd DataLabel="Наименование">@context.Name</MudTd>
+            <MudTd DataLabel="Ед">@context.Unit</MudTd>
+            <MudTd DataLabel="Цена">@context.Price</MudTd>
+            <MudTd DataLabel="Кол-во">0</MudTd>
         </RowTemplate>
         <NoRecordsContent>
             <MudText>Ничего не найдено</MudText>
